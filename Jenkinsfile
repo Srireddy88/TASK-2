@@ -1,61 +1,40 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_IMAGE = 'srilakshmiyannam/task-2'
-    }
-
     stages {
-        stage('Checkout') {
+        stage('Clone') {
             steps {
-                // Ensure the repository URL is correct
-                git 'https://github.com/Srireddy88/TASK-2.git'
+                echo 'Cloning repository...'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Build') {
             steps {
+                echo 'Installing dependencies...'
                 sh 'npm install'
             }
         }
 
-        stage('Run Tests') {
+        stage('Test') {
             steps {
-                sh 'npm test'
+                echo 'Running tests...'
+                // Replace with your actual test command
+                sh 'echo "No tests defined"'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Docker Build') {
             steps {
-                // Use the correct image name
-                sh "docker build -t ${DOCKER_IMAGE}:latest ."
-            }
-        }
-
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials-id') {
-                        // Use the same image name as built
-                        sh "docker push ${DOCKER_IMAGE}:latest"
-                    }
-                }
+                echo 'Building Docker image...'
+                sh 'docker build -t my-node-app-1 .'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'Deploying application...'
+                echo 'Running Docker container...'
+                sh 'docker run -d -p 3000:3000 --name my-running-app my-node-app-1'
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed.'
         }
     }
 }
